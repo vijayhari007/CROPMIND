@@ -2,9 +2,15 @@ services:
   - type: web
     name: cropmind
     env: python
-    buildCommand: chmod +x build.sh && ./build.sh
+    buildCommand: |
+      python --version
+      python -m ensurepip --upgrade
+      python -m pip install --upgrade pip setuptools wheel
+      chmod +x build.sh && ./build.sh
     startCommand: gunicorn backend.app:app
     envVars:
       - key: PYTHON_VERSION
         value: 3.10.0
+      - key: PYTHONPATH
+        value: /opt/render/project/src
     plan: free
