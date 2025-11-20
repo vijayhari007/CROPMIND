@@ -4,7 +4,7 @@
 set -e
 
 # Print Python version
-echo "Python version:"
+echo "3.10.0" > .python-version
 python --version
 
 # Install Node.js dependencies and build frontend
