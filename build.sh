@@ -19,6 +19,7 @@ echo "Upgrading pip and setuptools..."
 python3.10 -m pip install --upgrade pip==23.0.1 setuptools wheel
 
 echo "Installing Python dependencies..."
+python3.10 -m pip install gunicorn==20.1.0
 python3.10 -m pip install -r requirements.txt
 
 echo "=== Build completed successfully ==="
