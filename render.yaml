@@ -7,10 +7,12 @@ services:
       python -m ensurepip --upgrade
       python -m pip install --upgrade pip setuptools wheel
       chmod +x build.sh && ./build.sh
-    startCommand: . venv/bin/activate && gunicorn backend.app:app
+    startCommand: ./venv/bin/gunicorn backend.app:app
     envVars:
       - key: PYTHON_VERSION
         value: 3.10.0
       - key: PYTHONPATH
         value: /opt/render/project/src
+      - key: PORT
+        value: 10000
     plan: free
