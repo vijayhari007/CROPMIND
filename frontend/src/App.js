@@ -8,6 +8,7 @@ import SoilAnalysis from './pages/SoilAnalysis';
 import Dashboard from './pages/Dashboard';
 import About from './pages/About';
 import Advisor from './pages/Advisor';
+import GovernmentSchemes from './pages/GovernmentSchemes';
 import { I18nProvider } from './i18n';
 import AnimatedBackground from './components/AnimatedBackground';
 
@@ -26,6 +27,7 @@ function App() {
               <Route path="/soil-analysis" element={<SoilAnalysis />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/about" element={<About />} />
+              <Route path="/government-schemes" element={<GovernmentSchemes />} />
             </Routes>
           </main>
           <Toaster 

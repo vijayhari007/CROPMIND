@@ -7,7 +7,9 @@ import {
   InformationCircleIcon,
   Bars3Icon,
   XMarkIcon,
-  SparklesIcon
+  SparklesIcon,
+  DocumentTextIcon,
+  BuildingLibraryIcon
 } from '@heroicons/react/24/outline';
 import { useI18n } from '../i18n';
 
@@ -22,22 +24,23 @@ const Navbar = () => {
     { name: t('nav.advisor'), href: '/advisor', icon: SparklesIcon },
     { name: t('nav.soil'), href: '/soil-analysis', icon: BeakerIcon },
     { name: t('nav.dashboard'), href: '/dashboard', icon: ChartBarIcon },
+    { name: 'Government Schemes', href: '/government-schemes', icon: BuildingLibraryIcon },
     { name: t('nav.about'), href: '/about', icon: InformationCircleIcon },
   ];
 
   const isActive = (path) => location.pathname === path;
 
   return (
-    <nav className="bg-white shadow-lg border-b border-gray-200 relative z-40">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
+    <nav className="bg-white shadow-lg border-b border-gray-200 relative z-40 w-full">
+      <div className="w-full px-4 sm:px-8 lg:px-12">
+        <div className="flex justify-between h-16 max-w-[1800px] mx-auto">
           {/* Logo and brand */}
           <div className="flex items-center">
             <Link to="/" className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
                 <SparklesIcon className="w-5 h-5 text-white" />
               </div>
-              <span className="text-xl font-bold gradient-text">AgriTech</span>
+              <span className="text-xl font-bold gradient-text">CROP MIND</span>
             </Link>
           </div>
 

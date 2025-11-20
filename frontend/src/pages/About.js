@@ -5,11 +5,12 @@ const About = () => {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="card">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">About AgriTech</h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-4">About CROP MIND</h1>
           <p className="text-gray-700 leading-relaxed mb-4">
-            AgriTech is an intelligent fertilizer and advisory platform that empowers farmers with
-            data‑driven insights. It combines soil analytics, crop knowledge, weather awareness, and
-            market information to provide practical recommendations in multiple languages.
+            CROP MIND is an intelligent agricultural advisory platform that empowers farmers with
+            data‑driven insights. We combine advanced soil analytics, crop science, weather intelligence,
+            and market trends to provide actionable recommendations in multiple languages, helping farmers
+            make informed decisions for better yields and sustainable farming practices.
           </p>
 
           <h2 className="text-2xl font-semibold text-gray-900 mt-8 mb-3">What’s Included</h2>

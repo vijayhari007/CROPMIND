@@ -13,6 +13,14 @@ import base64
 from PIL import Image
 import sys
 import torch
+from soil_analysis.soil_classifier import SoilClassifier
+from soil_analysis.fertilizer_recommender import FertilizerRecommender
+from werkzeug.utils import secure_filename
+import os
+
+# Initialize soil analysis components
+soil_classifier = SoilClassifier()
+fertilizer_recommender = FertilizerRecommender()
 
 # Add the backend directory to the path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -39,24 +47,62 @@ def load_data():
         project_root = os.path.dirname(backend_dir)
         datasets_dir = os.path.join(project_root, 'datasets')
         models_dir = os.path.join(project_root, 'models')
+        
+        # Create default empty DataFrames
+        soil_data = pd.DataFrame()
+        crop_data = pd.DataFrame()
+        fertilizer_data = pd.DataFrame()
+        model = None
 
-        # Load datasets
-        soil_csv = os.path.join(datasets_dir, 'soil_data.csv')
-        crop_csv = os.path.join(datasets_dir, 'crop_data.csv')
-        fertilizer_csv = os.path.join(datasets_dir, 'fertilizer_data.csv')
+        # Load soil data with error handling
+        try:
+            soil_csv = os.path.join(datasets_dir, 'soil_data.csv')
+            if os.path.exists(soil_csv):
+                soil_data = pd.read_csv(soil_csv)
+                print(f"Successfully loaded soil data with {len(soil_data)} rows")
+            else:
+                print(f"Warning: {soil_csv} not found")
+        except Exception as e:
+            print(f"Error loading soil data: {e}")
 
-        soil_data = pd.read_csv(soil_csv)
-        crop_data = pd.read_csv(crop_csv)
-        fertilizer_data = pd.read_csv(fertilizer_csv)
+        # Load crop data with error handling
+        try:
+            crop_csv = os.path.join(datasets_dir, 'crop_data.csv')
+            if os.path.exists(crop_csv):
+                crop_data = pd.read_csv(crop_csv)
+                print(f"Successfully loaded crop data with {len(crop_data)} rows")
+            else:
+                print(f"Warning: {crop_csv} not found")
+        except Exception as e:
+            print(f"Error loading crop data: {e}")
+
+        # Load fertilizer data with error handling
+        try:
+            fertilizer_csv = os.path.join(datasets_dir, 'fertilizer_data.csv')
+            if os.path.exists(fertilizer_csv):
+                fertilizer_data = pd.read_csv(fertilizer_csv)
+                print(f"Successfully loaded fertilizer data with {len(fertilizer_data)} rows")
+            else:
+                print(f"Warning: {fertilizer_csv} not found")
+        except Exception as e:
+            print(f"Error loading fertilizer data: {e}")
         
         # Load trained model if exists
-        model_path = os.path.join(models_dir, 'fertilizer_model.pkl')
-        model = joblib.load(model_path) if os.path.exists(model_path) else None
+        try:
+            model_path = os.path.join(models_dir, 'fertilizer_model.pkl')
+            if os.path.exists(model_path):
+                model = joblib.load(model_path)
+                print("Successfully loaded the trained model")
+            else:
+                print("Warning: No trained model found")
+        except Exception as e:
+            print(f"Error loading model: {e}")
             
         return soil_data, crop_data, fertilizer_data, model
     except Exception as e:
-        print(f"Error loading data: {e}")
-        return None, None, None, None
+        print(f"Critical error in load_data: {e}")
+        # Return empty DataFrames instead of None to prevent attribute errors
+        return pd.DataFrame(), pd.DataFrame(), pd.DataFrame(), None
 
 # Initialize data
 soil_data, crop_data, fertilizer_data, model = load_data()
@@ -535,44 +581,121 @@ def search_soils():
 @app.route('/api/locations/states', methods=['GET'])
 def list_states():
     try:
+        # Default list of Indian states as fallback
+        default_states = [
+            'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh',
+            'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand',
+            'Karnataka', 'Kerala', 'Madhya Pradesh', 'Maharashtra', 'Manipur',
+            'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha', 'Punjab',
+            'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana', 'Tripura',
+            'Uttar Pradesh', 'Uttarakhand', 'West Bengal',
+            'Andaman and Nicobar Islands', 'Chandigarh', 'Dadra and Nagar Haveli and Daman and Diu',
+            'Delhi', 'Jammu and Kashmir', 'Ladakh', 'Lakshadweep', 'Puducherry'
+        ]
+        
         if soil_data is None or not isinstance(soil_data, pd.DataFrame) or soil_data.empty:
-            return jsonify({"success": True, "states": []})
-        states = (
-            soil_data['state']
-            .dropna()
-            .astype(str)
-            .str.strip()
-            .replace('', np.nan)
-            .dropna()
-            .unique()
-        )
-        states_sorted = sorted(states, key=lambda x: x.lower())
-        return jsonify({"success": True, "states": states_sorted})
+            print("Warning: Using default states list as soil data is not available")
+            return jsonify({"success": True, "states": default_states})
+            
+        try:
+            states = (
+                soil_data['state']
+                .dropna()
+                .astype(str)
+                .str.strip()
+                .replace('', np.nan)
+                .dropna()
+                .unique()
+            )
+            states_sorted = sorted(states, key=lambda x: x.lower())
+            
+            # If we got states from data, use them, otherwise fall back to defaults
+            if len(states_sorted) > 0:
+                return jsonify({"success": True, "states": states_sorted})
+            else:
+                print("Warning: No states found in soil data, using default list")
+                return jsonify({"success": True, "states": default_states})
+                
+        except Exception as e:
+            print(f"Error processing states from soil data: {e}")
+            return jsonify({"success": True, "states": default_states})
+            
     except Exception as e:
-        return jsonify({"success": False, "error": str(e)}), 500
+        print(f"Unexpected error in list_states: {e}")
+        return jsonify({"success": False, "error": "Failed to load states list"}), 500
 
 @app.route('/api/locations/districts', methods=['GET'])
 def list_districts():
     try:
         state = request.args.get('state', '').strip()
-        if soil_data is None or not isinstance(soil_data, pd.DataFrame) or soil_data.empty:
+        
+        # Default districts as fallback (grouped by state for better organization)
+        default_districts = {
+            'maharashtra': [
+                'Mumbai', 'Pune', 'Nagpur', 'Nashik', 'Aurangabad',
+                'Solapur', 'Amravati', 'Kolhapur', 'Sangli', 'Satara'
+            ],
+            'karnataka': [
+                'Bangalore', 'Mysore', 'Hubli', 'Mangalore', 'Belgaum',
+                'Gulbarga', 'Davanagere', 'Shimoga', 'Tumkur', 'Bellary'
+            ],
+            'tamil nadu': [
+                'Chennai', 'Coimbatore', 'Madurai', 'Tiruchirappalli',
+                'Salem', 'Tirunelveli', 'Vellore', 'Erode', 'Thoothukudi', 'Dindigul'
+            ]
+        }
+        
+        # If no state provided or soil data is not available, return empty list or state's districts
+        if not state:
             return jsonify({"success": True, "districts": []})
-        df = soil_data.copy()
-        if state:
-            df = df[df['state'].astype(str).str.strip().str.lower() == state.lower()]
-        districts = (
-            df['district']
-            .dropna()
-            .astype(str)
-            .str.strip()
-            .replace('', np.nan)
-            .dropna()
-            .unique()
-        )
-        districts_sorted = sorted(districts, key=lambda x: x.lower())
-        return jsonify({"success": True, "districts": districts_sorted})
+            
+        if soil_data is None or not isinstance(soil_data, pd.DataFrame) or soil_data.empty:
+            # Try to return default districts for the requested state if available
+            state_lower = state.lower()
+            if state_lower in default_districts:
+                return jsonify({
+                    "success": True, 
+                    "districts": sorted(default_districts[state_lower], key=lambda x: x.lower())
+                })
+            return jsonify({"success": True, "districts": []})
+            
+        try:
+            # Filter by state if provided
+            df = soil_data.copy()
+            if state:
+                df = df[df['state'].astype(str).str.strip().str.lower() == state.lower()]
+                
+            # Extract and process districts
+            districts = (
+                df['district']
+                .dropna()
+                .astype(str)
+                .str.strip()
+                .replace('', np.nan)
+                .dropna()
+                .unique()
+            )
+            
+            # If no districts found, try to return default districts for the state
+            if len(districts) == 0 and state.lower() in default_districts:
+                districts = default_districts[state.lower()]
+                
+            districts_sorted = sorted(districts, key=lambda x: x.lower())
+            return jsonify({"success": True, "districts": districts_sorted})
+            
+        except Exception as e:
+            print(f"Error processing districts: {e}")
+            # Fallback to default districts if available
+            if state.lower() in default_districts:
+                return jsonify({
+                    "success": True, 
+                    "districts": sorted(default_districts[state.lower()], key=lambda x: x.lower())
+                })
+            return jsonify({"success": True, "districts": []})
+            
     except Exception as e:
-        return jsonify({"success": False, "error": str(e)}), 500
+        print(f"Unexpected error in list_districts: {e}")
+        return jsonify({"success": False, "error": "Failed to load districts list"}), 500
 
 @app.route('/api/fertilizers', methods=['GET'])
 def get_fertilizers():
@@ -1168,5 +1291,80 @@ def chat():
             }) + '\n\n'
     return Response(generate(), mimetype='text/event-stream')
 
+@app.route('/api/soil/analyze', methods=['POST'])
+def analyze_soil_image():
+    """
+    Analyze soil image and provide fertilizer recommendations.
+    
+    Expected request format:
+    - form-data with 'image' (file): The soil image to analyze
+    - form-data with 'crop' (optional): The crop to be grown
+    
+    Returns:
+        JSON response with soil analysis and fertilizer recommendations
+    """
+    try:
+        # Check if image is provided
+        if 'image' not in request.files:
+            return jsonify({'error': 'No image provided'}), 400
+            
+        image_file = request.files['image']
+        if image_file.filename == '':
+            return jsonify({'error': 'No selected image'}), 400
+            
+        # Get optional crop parameter
+        crop = request.form.get('crop')
+        
+        # Read and process image
+        image = Image.open(image_file).convert('RGB')
+        
+        # Analyze soil type
+        soil_analysis = soil_classifier.predict(image)
+        
+        if 'error' in soil_analysis:
+            return jsonify({'error': f'Error analyzing soil: {soil_analysis["error"]}'}), 500
+        
+        # Get soil properties
+        soil_properties = soil_classifier.get_soil_properties(soil_analysis['soil_type'])
+        
+        # Get fertilizer recommendations
+        fertilizer_rec = fertilizer_recommender.get_recommendation(
+            soil_analysis['soil_type'],
+            crop
+        )
+        
+        # Get fertilizer schedule
+        schedule = fertilizer_recommender.get_fertilizer_schedule(
+            soil_analysis['soil_type'],
+            crop
+        )
+        
+        # Prepare response
+        response = {
+            'soil_analysis': {
+                'soil_type': soil_analysis['soil_type'],
+                'confidence': soil_analysis['confidence'],
+                'properties': soil_properties,
+                'all_probabilities': soil_analysis.get('all_probs', {})
+            },
+            'fertilizer_recommendation': {
+                'general': fertilizer_rec['general_recommendation'],
+                'crop_specific': fertilizer_rec.get('crop_specific'),
+                'special_notes': fertilizer_rec.get('special_notes', [])
+            },
+            'fertilizer_schedule': schedule,
+            'success': True
+        }
+        
+        return jsonify(response)
+        
+    except Exception as e:
+        return jsonify({
+            'error': f'Error processing soil image: {str(e)}',
+            'success': False
+        }), 500
+
 if __name__ == '__main__':
+    # Create uploads directory if it doesn't exist
+    os.makedirs('uploads', exist_ok=True)
     app.run(debug=True, host='0.0.0.0', port=5000)
