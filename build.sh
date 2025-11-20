@@ -1,18 +1,14 @@
 #!/bin/bash
 
-# Install frontend dependencies and build
+# Install Node.js dependencies and build frontend
+echo "Building frontend..."
 cd frontend
 npm install
 npm run build
-
-# Move build files to the root directory
-mv build ../
-
-# Go back to root directory
 cd ..
 
 # Install Python dependencies
+echo "Installing Python dependencies..."
 pip install -r requirements.txt
 
-# Run the Flask app
-gunicorn backend.app:app
+echo "Build completed successfully!"
