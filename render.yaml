@@ -12,7 +12,7 @@ services:
       - key: PYTHON_VERSION
         value: 3.10.0
       - key: PYTHONPATH
-        value: /opt/render/project/src
+        value: /opt/render/project/src/backend
       - key: PORT
         value: 10000
     plan: free
