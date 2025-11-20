@@ -12,13 +12,15 @@ cd ..
 
 # Install Python dependencies
 echo "Installing Python dependencies..."
-python -m pip install --upgrade pip
+python -m pip install --upgrade pip setuptools wheel
+
+# Install numpy first as it has system dependencies
+pip install numpy==1.24.3
+
+# Now install the rest of the requirements
 pip install -r requirements.txt
 
 # Install gunicorn explicitly
 pip install gunicorn
-
-# Install any other required system packages
-# apt-get update && apt-get install -y python3-gunicorn  # Uncomment if needed
 
 echo "Build completed successfully!"
