@@ -1,5 +1,4 @@
-# Update requirements.txt
-echo "Flask==2.3.3
+Flask==2.3.3
 Flask-Cors==4.0.0
 python-dotenv==1.0.0
 numpy==1.23.5
@@ -8,4 +7,4 @@ scikit-learn==1.2.2
 joblib==1.2.0
 gunicorn==20.1.0
 setuptools==68.0.0
-wheel==0.40.0" > requirements.txt
+wheel==0.40.0
