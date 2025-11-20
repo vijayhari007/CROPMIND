@@ -5,9 +5,10 @@ services:
     python:
       version: 3.10.0
     buildCommand: |
-      python --version
-      python -m ensurepip --upgrade
-      python -m pip install --upgrade pip==23.0.1 setuptools wheel
+      echo "Setting up Python 3.10.0 environment..."
+      python3.10 --version
+      python3.10 -m ensurepip --upgrade
+      python3.10 -m pip install --upgrade pip==23.0.1 setuptools wheel
       chmod +x build.sh && ./build.sh
     startCommand: gunicorn --timeout 120 --workers 1 --threads 4 --worker-class gthread backend.app:app --bind 0.0.0.0:$PORT
     envVars:
