@@ -25,7 +25,7 @@ python -m pip install --upgrade pip==23.0.1
 python -m pip install setuptools==68.0.0 wheel==0.40.0
 python -m pip install -r requirements.txt
 
-# Make gunicorn executable
-chmod +x venv/bin/gunicorn
+# Ensure gunicorn is installed
+python -m pip install gunicorn==20.1.0
 
 echo "Build completed successfully!"
