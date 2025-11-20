@@ -78,3 +78,9 @@ out/
 .fusebox/
 .dynamodb/
 .terragrunt-cache/
+
+# Model files
+*.pth
+*.pkl
+*.h5
+*.joblib
