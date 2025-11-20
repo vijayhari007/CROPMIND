@@ -7,7 +7,7 @@ services:
       python -m ensurepip --upgrade
       python -m pip install --upgrade pip setuptools wheel
       chmod +x build.sh && ./build.sh
-    startCommand: gunicorn backend.app:app
+    startCommand: . venv/bin/activate && gunicorn backend.app:app
     envVars:
       - key: PYTHON_VERSION
         value: 3.10.0
