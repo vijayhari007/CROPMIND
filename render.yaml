@@ -6,11 +6,11 @@ services:
       version: 3.10.0
     buildCommand: |
       echo "Setting up Python environment..."
-      python --version
-      python -m ensurepip --upgrade
-      python -m pip install --upgrade pip==23.0.1 setuptools wheel
-      chmod +x build.sh && ./build.sh
-    startCommand: python -m gunicorn -c gunicorn_config.py backend.app:app
+      python3.10 --version
+      python3.10 -m ensurepip --upgrade
+      python3.10 -m pip install --upgrade pip==23.0.1 setuptools==65.5.0 wheel==0.40.0
+      chmod +x build.sh && PYTHON_VERSION=3.10 ./build.sh
+    startCommand: python3.10 -m gunicorn -c gunicorn_config.py backend.app:app
     envVars:
       - key: PYTHON_VERSION
         value: 3.10.0

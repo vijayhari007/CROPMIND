@@ -12,11 +12,11 @@ cd ..
 
 # Python setup
 echo "Setting up Python environment..."
-python -m venv /opt/render/project/venv
+python3.10 -m venv /opt/render/project/venv
 source /opt/render/project/venv/bin/activate
 
 echo "Upgrading pip and setuptools..."
-python -m pip install --upgrade pip==23.0.1 setuptools wheel
+python -m pip install --upgrade pip==23.0.1 setuptools==65.5.0 wheel==0.40.0
 
 echo "Installing Python dependencies..."
 python -m pip install -r requirements.txt
