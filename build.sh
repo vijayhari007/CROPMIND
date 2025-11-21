@@ -12,7 +12,7 @@ cd ..
 
 # Python setup
 echo "Setting up Python environment..."
-python3.10 -m venv /opt/render/project/venv
+python -m venv /opt/render/project/venv
 source /opt/render/project/venv/bin/activate
 
 echo "Upgrading pip and setuptools..."
