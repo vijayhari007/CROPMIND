@@ -1,18 +1,9 @@
 services:
   - type: web
-    name: cropmind
-    env: python
-    buildCommand: |
-      echo "Setting up Python environment..."
-      python --version
-      python -m ensurepip --upgrade
-      python -m pip install --upgrade pip
-      chmod +x build.sh && ./build.sh
-    startCommand: /opt/render/project/venv/bin/gunicorn -b :$PORT backend.app:app
+    name: cropmind-static
+    env: static
+    buildCommand: npm --prefix frontend install && npm --prefix frontend run build
+    staticPublishPath: ./frontend/build
     envVars:
-      - key: PYTHONPATH
-        value: /opt/render/project/src
-      - key: PORT
-        value: 10000
-      - key: PATH
-        value: /opt/render/project/venv/bin:$PATH
+      - key: PUBLIC_URL
+        value: https://cropmind.onrender.com
