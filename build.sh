@@ -20,8 +20,9 @@ python -m pip install --upgrade pip==23.0.1 setuptools wheel
 
 echo "Installing Python dependencies..."
 python -m pip install -r requirements.txt
-
-# Install gunicorn explicitly in the virtual environment
 python -m pip install gunicorn==20.1.0
+
+# Create a symlink to gunicorn in a directory that's in the PATH
+ln -sf /opt/render/project/venv/bin/gunicorn /usr/local/bin/gunicorn || true
 
 echo "=== Build completed successfully ==="
