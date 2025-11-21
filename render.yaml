@@ -8,9 +8,7 @@ services:
       python -m ensurepip --upgrade
       python -m pip install --upgrade pip
       chmod +x build.sh && ./build.sh
-    startCommand: |
-      source /opt/render/project/venv/bin/activate
-      gunicorn -c gunicorn_config.py backend.app:app
+    startCommand: /opt/render/project/venv/bin/gunicorn -b :$PORT backend.app:app
     envVars:
       - key: PYTHONPATH
         value: /opt/render/project/src
@@ -18,5 +16,3 @@ services:
         value: 10000
       - key: PATH
         value: /opt/render/project/venv/bin:$PATH
-      - key: PYTHONHOME
-        value: /opt/render/project/venv
