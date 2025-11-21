@@ -12,13 +12,11 @@ cd ..
 
 # Python setup
 echo "Setting up Python environment..."
-python --version
-python -m ensurepip --upgrade
-python -m pip install --upgrade pip setuptools wheel
+python3.10 --version || { echo "Python 3.10 is not available. Please ensure it's installed."; exit 1; }
 
-# Create virtual environment
+# Create and activate virtual environment
 echo "Creating virtual environment..."
-python -m venv /opt/render/project/venv
+python3.10 -m venv /opt/render/project/venv
 source /opt/render/project/venv/bin/activate
 
 # Verify Python version in the virtual environment
