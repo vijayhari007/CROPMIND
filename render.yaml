@@ -10,11 +10,10 @@ services:
       python3.10 -m ensurepip --upgrade
       python3.10 -m pip install --upgrade pip==23.0.1 setuptools wheel
       chmod +x build.sh && ./build.sh
-    # Remove startCommand to use Procfile
     envVars:
       - key: PYTHON_VERSION
         value: 3.10.0
       - key: PYTHONPATH
-        value: /opt/render/project/src/backend
+        value: /opt/render/project/src
       - key: PORT
         value: 10000
