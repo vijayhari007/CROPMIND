@@ -2,15 +2,13 @@ services:
   - type: web
     name: cropmind
     env: python
-    python:
-      version: 3.10.0
     buildCommand: |
       echo "Setting up Python environment..."
       python --version
       python -m ensurepip --upgrade
-      python -m pip install --upgrade pip setuptools wheel
+      python -m pip install --upgrade pip
       chmod +x build.sh && ./build.sh
-    startCommand: /opt/render/project/venv/bin/python -m gunicorn -c gunicorn_config.py backend.app:app
+    startCommand: /opt/render/project/venv/bin/gunicorn -c gunicorn_config.py backend.app:app
     envVars:
       - key: PYTHONPATH
         value: /opt/render/project/src
