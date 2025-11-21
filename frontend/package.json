@@ -1,8 +1,8 @@
 {
   "name": "fertilizer-recommendation-frontend",
-  "version": "1.0.0",
-  "description": "Frontend for AgriTech Fertilizer Recommendation System",
-  "main": "index.js",
+  "version": "0.1.0",
+  "homepage": ".",
+  "private": true,
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",

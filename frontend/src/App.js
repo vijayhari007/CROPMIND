@@ -15,7 +15,7 @@ import AnimatedBackground from './components/AnimatedBackground';
 function App() {
   return (
     <I18nProvider>
-      <Router>
+      <Router basename={process.env.PUBLIC_URL}>
         <div className="min-h-screen relative">
           <AnimatedBackground />
           <Navbar />
