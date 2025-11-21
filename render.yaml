@@ -10,7 +10,7 @@ services:
       python3.10 -m ensurepip --upgrade
       python3.10 -m pip install --upgrade pip==23.0.1 setuptools wheel
       chmod +x build.sh && ./build.sh
-    startCommand: /opt/render/project/src/venv/bin/gunicorn --timeout 120 --workers 1 --threads 4 --worker-class gthread backend.app:app --bind 0.0.0.0:$PORT
+    startCommand: python -m gunicorn --timeout 120 --workers 1 --threads 4 --worker-class gthread backend.app:app --bind 0.0.0.0:$PORT
     envVars:
       - key: PYTHON_VERSION
         value: 3.10.0
