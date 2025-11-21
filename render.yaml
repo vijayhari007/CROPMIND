@@ -10,6 +10,7 @@ services:
       python3.10 -m ensurepip --upgrade
       python3.10 -m pip install --upgrade pip==23.0.1 setuptools wheel
       chmod +x build.sh && ./build.sh
+    startCommand: python -m gunicorn -c gunicorn_config.py backend.app:app
     envVars:
       - key: PYTHON_VERSION
         value: 3.10.0
