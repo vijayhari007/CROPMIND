@@ -6,14 +6,12 @@ services:
       version: 3.10.0
     buildCommand: |
       echo "Setting up Python environment..."
-      python3.10 --version
-      python3.10 -m ensurepip --upgrade
-      python3.10 -m pip install --upgrade pip==23.0.1 setuptools==65.5.0 wheel==0.40.0
+      python --version
+      python -m ensurepip --upgrade
+      python -m pip install --upgrade pip setuptools wheel
       chmod +x build.sh && ./build.sh
     startCommand: /opt/render/project/venv/bin/python -m gunicorn -c gunicorn_config.py backend.app:app
     envVars:
-      - key: PYTHON_VERSION
-        value: 3.10.0
       - key: PYTHONPATH
         value: /opt/render/project/src
       - key: PORT

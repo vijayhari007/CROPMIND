@@ -12,11 +12,11 @@ cd ..
 
 # Python setup
 echo "Setting up Python environment..."
-python3.10 --version || { echo "Python 3.10 is not available. Please ensure it's installed."; exit 1; }
+python --version
 
 # Create and activate virtual environment
 echo "Creating virtual environment..."
-python3.10 -m venv /opt/render/project/venv
+python -m venv /opt/render/project/venv
 source /opt/render/project/venv/bin/activate
 
 # Verify Python version in the virtual environment
@@ -24,7 +24,7 @@ echo "Python version: $(python --version)"
 echo "Pip version: $(python -m pip --version)"
 
 echo "Upgrading pip and setuptools..."
-python -m pip install --upgrade pip==23.0.1 setuptools==65.5.0 wheel==0.40.0
+python -m pip install --upgrade pip setuptools wheel
 
 echo "Installing Python dependencies..."
 python -m pip install -r requirements.txt
