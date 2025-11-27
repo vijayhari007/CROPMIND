@@ -3,13 +3,6 @@ set -e
 
 echo "=== Starting build process ==="
 
-# Build frontend
-echo "Building frontend..."
-cd frontend
-npm install
-npm run build
-cd ..
-
 # Python setup
 echo "Setting up Python environment..."
 python --version
@@ -23,19 +16,17 @@ source /opt/render/project/venv/bin/activate
 echo "Upgrading pip..."
 python -m pip install --upgrade pip
 
+# Install requirements
+echo "Installing Python dependencies..."
+python -m pip install -r requirements.txt
+
 # Install Gunicorn explicitly
 echo "Installing Gunicorn..."
 python -m pip install gunicorn==21.2.0
 
+# Verify installation
 echo "Python version: $(python --version)"
 echo "Pip version: $(python -m pip --version)"
-
-echo "Installing Python dependencies..."
-python -m pip install -r requirements.txt
-
-# Verify Gunicorn is installed
-echo "Verifying Gunicorn installation..."
-which gunicorn
 gunicorn --version
 
 echo "=== Build completed successfully ==="

@@ -14,8 +14,8 @@ services:
       - key: OPENWEATHER_API_KEY
         sync: false  # Set this in Render dashboard
     buildCommand: |
-      python -m pip install --upgrade pip
-      python -m pip install -r requirements.txt
+      chmod +x build.sh
+      ./build.sh
     startCommand: gunicorn --bind :$PORT backend.app:app
     plan: free
 
