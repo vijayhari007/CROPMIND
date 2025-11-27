@@ -9,12 +9,13 @@ services:
         value: "production"
       - key: PYTHONUNBUFFERED
         value: "1"
+      - key: PYTHON_VERSION
+        value: "3.10.0"  # Using a more stable Python version
       - key: OPENWEATHER_API_KEY
         sync: false  # Set this in Render dashboard
     buildCommand: |
-      pip install --upgrade pip
-      pip install -r requirements.txt
-      pip install gunicorn
+      python -m pip install --upgrade pip
+      python -m pip install -r requirements.txt
     startCommand: gunicorn --bind :$PORT backend.app:app
     plan: free
 
