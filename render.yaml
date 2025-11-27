@@ -4,7 +4,7 @@ services:
     env: python
     buildCommand: |
       pip install -r requirements.txt
-      pip install -e .
+      pip install .
     startCommand: gunicorn --bind :$PORT backend.app:app
     envVars:
       - key: PYTHON_VERSION
