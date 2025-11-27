@@ -3,6 +3,7 @@ services:
     name: cropmind-backend
     env: python
     buildCommand: |
+      pip install -r requirements.txt
       pip install -e .
     startCommand: gunicorn --bind :$PORT backend.app:app
     envVars:
@@ -13,7 +14,6 @@ services:
       - key: OPENWEATHER_API_KEY
         sync: false
     plan: free
-  # Frontend Service
   - type: web
     name: cropmind-frontend
     env: static
@@ -22,11 +22,7 @@ services:
       npm install
       npm run build
     staticPublishPath: "./frontend/build"
-    routes:
-      - type: rewrite
-        source: "/*"
-        destination: "/index.html"
     envVars:
       - key: REACT_APP_API_URL
-        sync: false  # Set this to backend URL after deployment
+        sync: false
     plan: free
