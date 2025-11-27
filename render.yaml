@@ -4,9 +4,8 @@ services:
     name: cropmind-backend
     runtime: python
     buildCommand: |
-      python -m pip install --upgrade pip
-      pip install -r requirements.txt
-      pip install gunicorn
+      chmod +x setup.sh
+      ./setup.sh
     startCommand: gunicorn --bind :$PORT backend.app:app
     envVars:
       - key: FLASK_APP
