@@ -1200,25 +1200,70 @@ def api_translate():
 
 @app.route('/api/tts', methods=['POST'])
 def tts():
-    """Text-to-speech: returns base64-encoded MP3 audio for given text and language."""
+    """Text-to-speech: returns base64-encoded MP3 audio for given text and language.
+    
+    This endpoint uses gTTS (Google Text-to-Speech) which requires internet connection.
+    If gTTS is not available or fails, it will return an error with instructions.
+    """
     try:
         data = request.get_json(force=True)
         text = data.get('text')
         lang = data.get('language', 'en')
+        
         if not text:
-            return jsonify({"success": False, "error": "text is required"}), 400
+            return jsonify({"success": False, "error": "Text is required"}), 400
+            
+        # Limit text length to prevent abuse
+        if len(text) > 500:
+            text = text[:500] + "..."
+            
         try:
-            from gtts import gTTS
-            tts = gTTS(text=text, lang=lang)
-            buf = BytesIO()
-            tts.write_to_fp(buf)
-            buf.seek(0)
-            b64 = base64.b64encode(buf.read()).decode('utf-8')
-            return jsonify({"success": True, "audio_base64": b64, "format": "mp3"})
+            # Try to import gTTS
+            try:
+                from gtts import gTTS
+            except ImportError:
+                return jsonify({
+                    "success": False, 
+                    "error": "Text-to-speech feature is not available. Please install gTTS package: pip install gTTS"
+                }), 500
+                
+            # Create TTS and handle potential network issues
+            try:
+                tts = gTTS(text=text, lang=lang, lang_check=False)
+                buf = BytesIO()
+                tts.write_to_fp(buf)
+                buf.seek(0)
+                b64 = base64.b64encode(buf.read()).decode('utf-8')
+                return jsonify({
+                    "success": True, 
+                    "audio_base64": b64, 
+                    "format": "mp3",
+                    "language": lang
+                })
+                
+            except Exception as e:
+                # Handle specific gTTS errors
+                error_msg = str(e).lower()
+                if 'internet' in error_msg or 'connection' in error_msg:
+                    return jsonify({
+                        "success": False, 
+                        "error": "Internet connection is required for text-to-speech functionality"
+                    }), 503
+                elif 'language' in error_msg:
+                    return jsonify({
+                        "success": False,
+                        "error": f"Language '{lang}' is not supported for text-to-speech"
+                    }), 400
+                else:
+                    return jsonify({
+                        "success": False, 
+                        "error": f"Failed to generate speech: {str(e)}"
+                    }), 500
+                    
         except Exception as e:
-            return jsonify({"success": False, "error": f"TTS failed: {e}"}), 500
+            return jsonify({"success": False, "error": str(e)}), 400
     except Exception as e:
-        return jsonify({"success": False, "error": str(e)}), 400
+        return jsonify({"success": False, "error": f"Unexpected error: {str(e)}"}), 500
 
 
 @app.route('/api/feedback', methods=['POST'])

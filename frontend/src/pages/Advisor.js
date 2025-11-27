@@ -77,29 +77,84 @@ const Advisor = () => {
     finally { setAdvisoryLoading(false); }
   };
 
-  const b64ToBlob = (b64Data, contentType = '', sliceSize = 512) => {
-    const byteCharacters = atob(b64Data);
-    const byteArrays = [];
-    for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
-      const slice = byteCharacters.slice(offset, offset + sliceSize);
-      const byteNumbers = new Array(slice.length);
-      for (let i = 0; i < slice.length; i++) byteNumbers[i] = slice.charCodeAt(i);
-      const byteArray = new Uint8Array(byteNumbers); byteArrays.push(byteArray);
+  // Load voices when component mounts
+  useEffect(() => {
+    if ('speechSynthesis' in window) {
+      const loadVoices = () => {
+        window.speechSynthesis.getVoices();
+      };
+      
+      // Some browsers need this event to populate voices
+      window.speechSynthesis.onvoiceschanged = loadVoices;
+      loadVoices();
+      
+      return () => {
+        window.speechSynthesis.onvoiceschanged = null;
+      };
     }
-    return new Blob(byteArrays, { type: contentType });
-  };
+  }, []);
 
-  const speakAdvisory = async () => {
-    if (!advisoryText) { toast.error('Generate advisory first'); return; }
-    setAdvisoryLoading(true);
-    try {
-      const res = await axios.post('http://localhost:5000/api/tts', { text: advisoryText, language: advisoryInput.language || 'en' });
-      if (res.data.success && res.data.audio_base64) {
-        const blob = b64ToBlob(res.data.audio_base64, 'audio/mpeg');
-        const url = URL.createObjectURL(blob); setAdvisoryAudioUrl(url);
-      } else toast.error('TTS failed');
-    } catch (e) { toast.error('Server error while generating TTS'); }
-    finally { setAdvisoryLoading(false); }
+  const speakAdvisory = () => {
+    if (!advisoryText) {
+      toast.error('Generate advisory first');
+      return;
+    }
+
+    // Check if the Web Speech API is available
+    if (!('speechSynthesis' in window)) {
+      toast.error('Text-to-speech is not supported in your browser');
+      return;
+    }
+
+    // Create a function to handle the actual speaking
+    const speak = () => {
+      try {
+        // Cancel any ongoing speech
+        window.speechSynthesis.cancel();
+
+        const utterance = new SpeechSynthesisUtterance(advisoryText);
+        
+        const languageMap = {
+          'en': 'en-US',
+          'hi': 'hi-IN',
+          'te': 'te-IN',
+          'ta': 'ta-IN',
+          'bn': 'bn-IN',
+          'mr': 'mr-IN'
+        };
+        
+        utterance.lang = languageMap[advisoryInput.language] || 'en-US';
+        
+        const voices = window.speechSynthesis.getVoices();
+        const preferredVoice = voices.find(voice => 
+          voice.lang.startsWith(advisoryInput.language) || 
+          voice.lang.startsWith(advisoryInput.language + '-')
+        );
+        
+        if (preferredVoice) {
+          utterance.voice = preferredVoice;
+        }
+
+        // Handle errors
+        utterance.onerror = (event) => {
+          console.error('SpeechSynthesis error:', event);
+          toast.error('Error generating speech');
+        };
+
+        window.speechSynthesis.speak(utterance);
+      } catch (error) {
+        console.error('Error in speakAdvisory:', error);
+        toast.error('Error generating speech');
+      }
+    };
+
+    // On some browsers, we need user interaction first
+    if (window.speechSynthesis.speaking) {
+      window.speechSynthesis.cancel();
+      setTimeout(speak, 100);
+    } else {
+      speak();
+    }
   };
 
 
@@ -193,7 +248,16 @@ const Advisor = () => {
             </div>
             <div className="mt-4 flex gap-3">
               <button onClick={fetchAdvisory} disabled={advisoryLoading} className="btn-primary">{advisoryLoading ? '...' : t('button.generate_advisory')}</button>
-              <button onClick={speakAdvisory} disabled={advisoryLoading || !advisoryText} className="btn-secondary">{t('button.speak_advisory')}</button>
+              <button 
+                onClick={speakAdvisory} 
+                disabled={!advisoryText} 
+                className="btn-secondary flex items-center gap-2"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" />
+                </svg>
+                {t('button.speak_advisory')}
+              </button>
             </div>
             {advisoryText && (
               <div className="mt-4">
@@ -206,7 +270,7 @@ const Advisor = () => {
               </div>
             )}
           </div>
-
+          
 
           {/* Pest Detection */}
           <div className="card">

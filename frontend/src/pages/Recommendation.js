@@ -135,11 +135,18 @@ const Recommendation = () => {
       toast.error('Generate advisory first');
       return;
     }
+    
+    // Only allow English text for speech synthesis
+    if (advisoryInput.language && advisoryInput.language !== 'en') {
+      toast.error('Speech synthesis is only available in English');
+      return;
+    }
+    
     setAdvisoryLoading(true);
     try {
       const res = await axios.post('http://localhost:5000/api/tts', {
         text: advisoryText,
-        language: advisoryInput.language || 'en'
+        language: 'en' // Force English for TTS
       });
       if (res.data.success && res.data.audio_base64) {
         const b64 = res.data.audio_base64;
