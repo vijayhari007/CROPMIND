@@ -4,8 +4,8 @@ services:
     name: cropmind-backend
     runtime: python
     buildCommand: |
-      chmod +x setup.sh
-      ./setup.sh
+      chmod +x build.sh
+      ./build.sh
     startCommand: gunicorn --bind :$PORT backend.app:app
     envVars:
       - key: FLASK_APP

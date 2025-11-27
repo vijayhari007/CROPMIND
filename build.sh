@@ -12,21 +12,21 @@ echo "Creating virtual environment..."
 python -m venv /opt/render/project/venv
 source /opt/render/project/venv/bin/activate
 
-# Upgrade pip first
+# Upgrade pip
 echo "Upgrading pip..."
 python -m pip install --upgrade pip
 
 # Install requirements
 echo "Installing Python dependencies..."
-python -m pip install -r requirements.txt
+pip install -r requirements.txt
 
-# Install Gunicorn explicitly
+# Install Gunicorn
 echo "Installing Gunicorn..."
-python -m pip install gunicorn==21.2.0
+pip install gunicorn
 
 # Verify installation
 echo "Python version: $(python --version)"
-echo "Pip version: $(python -m pip --version)"
+echo "Pip version: $(pip --version)"
 gunicorn --version
 
 echo "=== Build completed successfully ==="
