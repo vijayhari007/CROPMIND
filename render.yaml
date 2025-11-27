@@ -12,10 +12,10 @@ services:
       - key: OPENWEATHER_API_KEY
         sync: false  # Set this in Render dashboard
     buildCommand: |
+      pip install --upgrade pip
       pip install -r requirements.txt
       pip install gunicorn
     startCommand: gunicorn --bind :$PORT backend.app:app
-    env: python
     plan: free
 
   # Frontend Service
@@ -34,6 +34,4 @@ services:
     envVars:
       - key: REACT_APP_API_URL
         sync: false  # Set this to backend URL after deployment
-      - key: NODE_VERSION
-        value: "18.16.0"
     plan: free
