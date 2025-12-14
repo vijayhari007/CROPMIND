@@ -11,8 +11,48 @@
     />
     <link rel="apple-touch-icon" href="./logo192.png" />
     <link rel="manifest" href="./manifest.json" crossorigin="use-credentials" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <title>CROP MIND - Smart Agricultural Advisory System</title>
+    <!-- Security Scripts -->
+    <script>
+      // Disable right-click context menu
+      document.addEventListener("contextmenu", function (e) {
+        e.preventDefault();
+        alert("Right-click is disabled for security reasons.");
+        return false;
+      });
+
+      // Disable keyboard shortcuts
+      document.addEventListener("keydown", function (e) {
+        // Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U, Ctrl+Shift+C
+        if (
+          e.key === "F12" ||
+          (e.ctrlKey &&
+            e.shiftKey &&
+            (e.key === "I" ||
+              e.key === "J" ||
+              e.key === "C" ||
+              e.key === "i" ||
+              e.key === "j" ||
+              e.key === "c")) ||
+          (e.ctrlKey && e.key === "u")
+        ) {
+          e.preventDefault();
+          alert("This action is disabled for security reasons.");
+          return false;
+        }
+      });
+
+      // Make it harder to override the console
+      Object.defineProperty(window, "console", {
+        value: console,
+        writable: false,
+        configurable: false,
+      });
+    </script>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
